@@ -1,0 +1,6 @@
+customer_id,conversion_probability,top_positive_drivers,top_negative_drivers,waterfall_plot
+7381,0.9984258413314819,campaign_engagement_rate (3.1015); income_per_person (1.3558); recency (0.7095),deal_sensitivity (-0.2486); education_rank (-0.1551); income (-0.1033),D:\DataScience\models\shap\customer_7381_waterfall.png
+3009,0.997601330280304,campaign_engagement_rate (3.2484); income_per_person (0.9839); recency (0.8607),deal_sensitivity (-0.2542); total_purchases (-0.2139); income (-0.1738),D:\DataScience\models\shap\customer_3009_waterfall.png
+9493,0.9972519278526306,campaign_engagement_rate (2.1555); recency (1.0259); income_per_person (0.8979),deal_sensitivity (-0.3201); num_web_visits_month (-0.2529); income (-0.1707),D:\DataScience\models\shap\customer_9493_waterfall.png
+3667,0.9958265423774719,campaign_engagement_rate (3.9268); income_per_person (0.8648); avg_spend_per_purchase (0.6045),marital_clean_Married (-0.4910); deal_sensitivity (-0.3827); income (-0.3169),D:\DataScience\models\shap\customer_3667_waterfall.png
+4947,0.9950764775276184,campaign_engagement_rate (2.0020); income_per_person (1.2416); customer_tenure_days (1.0041),education_rank (-0.9499); deal_sensitivity (-0.3833); marital_clean_Divorced (-0.0761),D:\DataScience\models\shap\customer_4947_waterfall.png
