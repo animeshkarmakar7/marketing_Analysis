@@ -11,7 +11,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 
 _API_DIR = Path(__file__).resolve().parent
 if str(_API_DIR) not in sys.path:
@@ -279,11 +279,15 @@ async def predict_conversion_batch(
 
 
 
-@app.get("/", include_in_schema=False)
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def root():
-    """Redirect root to interactive Swagger docs."""
-    from fastapi.responses import RedirectResponse  # noqa: PLC0415
-
+    """Serve the interactive web simulation dashboard."""
+    html_path = Path(__file__).resolve().parent / "static" / "index.html"
+    if html_path.exists():
+        return HTMLResponse(content=html_path.read_text(encoding="utf-8"))
+    
+    # Fallback to redirect if index.html is missing
+    from fastapi.responses import RedirectResponse
     return RedirectResponse(url="/docs")
 
 

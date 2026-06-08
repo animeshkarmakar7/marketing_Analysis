@@ -39,6 +39,36 @@ sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "airflow" / "dags"))
 
 # ---------------------------------------------------------------------------
+# Mock Airflow to run without apache-airflow package installed
+# ---------------------------------------------------------------------------
+from types import ModuleType
+
+class DummyDAG:
+    def __init__(self, *args, **kwargs):
+        pass
+    def __enter__(self):
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+class DummyOperator:
+    def __init__(self, *args, **kwargs):
+        pass
+    def __rshift__(self, other):
+        return other
+
+airflow_mock = ModuleType("airflow")
+airflow_mock.DAG = DummyDAG  # type: ignore
+
+operators_mock = ModuleType("airflow.operators")
+operators_python_mock = ModuleType("airflow.operators.python")
+operators_python_mock.PythonOperator = DummyOperator  # type: ignore
+
+sys.modules["airflow"] = airflow_mock
+sys.modules["airflow.operators"] = operators_mock
+sys.modules["airflow.operators.python"] = operators_python_mock
+
+# ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
 logging.basicConfig(
@@ -71,23 +101,23 @@ except ImportError as e:
 
 TASKS: dict[str, tuple[str, object]] = {
     "validate_mysql_connection": (
-        "Task 1 — Validate MySQL connection + row counts",
+        "Task 1 - Validate MySQL connection + row counts",
         validate_mysql_connection,
     ),
     "pyspark_feature_engineering": (
-        "Task 2 — PySpark ETL → features.csv",
+        "Task 2 - PySpark ETL -> features.csv",
         pyspark_feature_engineering,
     ),
     "score_customers": (
-        "Task 3 — XGBoost scoring → conversion_scores.csv",
+        "Task 3 - XGBoost scoring -> conversion_scores.csv",
         score_customers,
     ),
     "update_segments": (
-        "Task 4 — KMeans segmentation + MySQL update",
+        "Task 4 - KMeans segmentation + MySQL update",
         update_segments,
     ),
     "refresh_dashboard_data": (
-        "Task 5 — Dashboard export → dashboard_export.csv",
+        "Task 5 - Dashboard export -> dashboard_export.csv",
         refresh_dashboard_data,
     ),
 }
@@ -119,7 +149,7 @@ def run_task(task_id: str, dry_run: bool = False) -> dict | None:
     try:
         result = callable_()
         elapsed = time.perf_counter() - start
-        log.info("Task completed in %.1fs — result: %s", elapsed, result)
+        log.info("Task completed in %.1fs - result: %s", elapsed, result)
         return result
     except Exception as exc:
         elapsed = time.perf_counter() - start
@@ -128,7 +158,7 @@ def run_task(task_id: str, dry_run: bool = False) -> dict | None:
 
 
 def run_all(dry_run: bool = False) -> None:
-    _banner("MARKETING INTELLIGENCE PIPELINE — FULL RUN")
+    _banner("MARKETING INTELLIGENCE PIPELINE - FULL RUN")
     log.info("Started at %s", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     results: dict[str, dict | None] = {}

@@ -88,7 +88,7 @@ def _run_script(script_path: Path, extra_args: list[str] | None = None) -> int:
 
 def _assert_file(path: Path, label: str) -> None:
     if not path.exists() or path.stat().st_size == 0:
-        raise FileNotFoundError(f"Expected output missing or empty: {label} → {path}")
+        raise FileNotFoundError(f"Expected output missing or empty: {label} -> {path}")
     log.info("Verified: %s (%d bytes)", label, path.stat().st_size)
 
 
@@ -125,9 +125,9 @@ def validate_mysql_connection(**context) -> dict:
         cursor.execute(f"SELECT COUNT(*) FROM {table}")  # noqa: S608
         row_count = cursor.fetchone()[0]
         counts[table] = row_count
-        log.info("Table %-30s → %d rows", table, row_count)
+        log.info("Table %-30s -> %d rows", table, row_count)
         if row_count == 0:
-            raise ValueError(f"Table '{table}' is empty — pipeline aborted.")
+            raise ValueError(f"Table '{table}' is empty - pipeline aborted.")
 
     cursor.close()
     conn.close()
@@ -188,7 +188,7 @@ def score_customers(**context) -> dict:
 
     # ── Train if model doesn't exist yet ──────────────────────────────────
     if not model_path.exists():
-        log.warning("Model not found — running train_model.py first.")
+        log.warning("Model not found - running train_model.py first.")
         rc = _run_script(TRAIN_SCRIPT)
         if rc != 0:
             raise RuntimeError("train_model.py failed.")
@@ -228,7 +228,7 @@ def score_customers(**context) -> dict:
     low  = int((scored["recommendation"] == "LOW PRIORITY").sum())
 
     log.info(
-        "Scoring complete — HIGH: %d | MEDIUM: %d | LOW: %d | Total: %d",
+        "Scoring complete - HIGH: %d | MEDIUM: %d | LOW: %d | Total: %d",
         high, med, low, len(scored),
     )
 
@@ -245,7 +245,7 @@ def score_customers(**context) -> dict:
     )
 
     log.info(
-        "Business ROI estimate — targeting %d customers → "
+        "Business ROI estimate - targeting %d customers -> "
         "~%d converts | revenue: %d | saved contact cost: %d | ROI: %.1f%%",
         high_customers, expected_converts, revenue_captured, cost_saved, net_roi_pct,
     )

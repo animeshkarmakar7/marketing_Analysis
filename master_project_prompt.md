@@ -537,14 +537,14 @@ Examples:
 
 Update this section as you complete each phase.
 
-- [ ] Phase 1: MySQL database + schema + load_data.py + 10 SQL queries
-- [ ] Phase 2: PySpark ETL pipeline
-- [ ] Phase 3: K-Means segmentation model
-- [ ] Phase 3: XGBoost conversion model + SHAP
+- [x] Phase 1: MySQL database + schema + load_data.py + 10 SQL queries  ← DONE
+- [x] Phase 2: PySpark ETL pipeline  ← DONE
+- [x] Phase 3: K-Means segmentation model  ← DONE
+- [x] Phase 3: XGBoost conversion model + SHAP  ← DONE
 - [x] Phase 4: FastAPI endpoints  ← DONE (3 endpoints: /health, /predict-conversion, /predict-conversion/batch)
-- [ ] Phase 4: Airflow DAG
-- [ ] Phase 5: Power BI dashboard
-- [ ] Final: README.md + GitHub push + documentation
+- [x] Phase 5: Airflow DAG  ← DONE (Nightly pipeline + standalone runner)
+- [x] Phase 6: Power BI dashboard  ← DONE (DAX Measures + visual wireframes + KPI validator)
+- [x] Final: README.md + GitHub push + documentation  ← DONE (Comprehensive repository README.md created)
 
 ---
 

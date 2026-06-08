@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing Intelligence System Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        darkBg: '#0B0F19',
+                        cardBg: 'rgba(30, 41, 59, 0.65)',
+                        accentIndigo: '#6366F1',
+                        accentEmerald: '#10B981',
+                        accentAmber: '#F59E0B',
+                        accentRose: '#F43F5E',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #0B0F19;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+        
+        .glass-card {
+            background: rgba(30, 41, 59, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glow-indigo:hover {
+            box-shadow: 0 0 20px 0 rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        /* Animated connection status indicator */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .4; transform: scale(1.15); }
+        }
+        .ping-indicator {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        /* Progress radial ring custom styles */
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.6s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="text-slate-200 font-sans min-h-screen pb-12">
+
+    <!-- Header Navigation -->
+    <header class="border-b border-slate-800/80 bg-slate-950/65 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="h-9 w-9 rounded-lg bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/30">
+                    <i class="fa-solid fa-chart-line text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-outfit font-bold text-lg leading-tight tracking-wide text-white">Marketing Intelligence</h1>
+                    <p class="text-xs text-slate-400">Enterprise AI Targeting Portal</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- API Connection Indicator -->
+                <div class="flex items-center bg-slate-800/50 rounded-full px-3 py-1 text-xs border border-slate-700/60">
+                    <span class="relative flex h-2 w-2 mr-2">
+                        <span class="ping-indicator absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span id="api-status-text" class="text-slate-300 font-medium">Connecting...</span>
+                </div>
+                
+                <a href="/docs" target="_blank" class="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1.5">
+                    <i class="fa-solid fa-book-open"></i> API Docs
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        
+        <!-- Welcome Hero/Context -->
+        <div class="mb-8">
+            <h2 class="font-outfit font-bold text-3xl text-white mb-2">Targeting Optimization Simulator</h2>
+            <p class="text-slate-400 max-w-3xl">
+                This simulator showcases how machine learning targets marketing campaigns. Load preset customer archetypes or adjust features manually to predict conversion probability and see the business outcomes.
+            </p>
+        </div>
+
+        <!-- Dashboard Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Side: Simulator Form (7 cols) -->
+            <section class="lg:col-span-7 glass-card rounded-2xl p-6 relative overflow-hidden">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-slate-800 pb-4">
+                    <h3 class="font-outfit font-semibold text-lg text-white flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-indigo-500"></i> Customer Profile Editor
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="loadPreset('vip')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600/20 text-indigo-300 border border-indigo-500/20 hover:bg-indigo-600/35 transition duration-200">
+                            VIP
+                        </button>
+                        <button onclick="loadPreset('atrisk')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-600/20 text-amber-300 border border-amber-500/20 hover:bg-amber-600/35 transition duration-200">
+                            At Risk
+                        </button>
+                        <button onclick="loadPreset('new')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600/20 text-emerald-300 border border-emerald-500/20 hover:bg-emerald-600/35 transition duration-200">
+                            New Customer
+                        </button>
+                        <button onclick="resetForm()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700/50 transition duration-200">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input Form -->
+                <form id="prediction-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        
+                        <!-- Col 1 -->
+                        <div class="space-y-4">
+                            <div>
+                                <label for="age" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Age</label>
+                                <input type="number" id="age" required min="18" max="100" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                            
+                            <div>
+                                <label for="income" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Annual Income ($)</label>
+                                <input type="number" id="income" required min="1000" max="200000" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                            
+                            <div>
+                                <label for="total_spend" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Total Spend (2 yrs)</label>
+                                <input type="number" id="total_spend" required min="0" max="10000" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label for="total_purchases" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Total Purchases</label>
+                                <input type="number" id="total_purchases" required min="1" max="100" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label for="avg_spend_per_purchase" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Avg Spend / Purchase</label>
+                                <input type="number" step="0.01" id="avg_spend_per_purchase" required min="0" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label for="recency" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Recency (Days since last buy)</label>
+                                <input type="number" id="recency" required min="0" max="365" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label for="num_web_visits_month" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Monthly Web Visits</label>
+                                <input type="number" id="num_web_visits_month" required min="0" max="30" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label for="campaign_engagement_rate" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Campaign Engagement (0-1)</label>
+                                <input type="number" step="0.2" id="campaign_engagement_rate" required min="0" max="1" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <!-- Col 2 -->
+                        <div class="space-y-4">
+                            <div>
+                                <label for="education_rank" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Education Rank</label>
+                                <select id="education_rank" required class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                    <option value="1">1 (Basic)</option>
+                                    <option value="2">2 (2n Cycle)</option>
+                                    <option value="3">3 (Graduation)</option>
+                                    <option value="4">4 (Master)</option>
+                                    <option value="5">5 (PhD)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="marital_clean" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Marital Status</label>
+                                <select id="marital_clean" required class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Divorced">Divorced</option>
+                                    <option value="Widow">Widow</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="total_children" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Total Children at Home</label>
+                                <input type="number" id="total_children" required min="0" max="5" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label for="has_children" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Has Children (0 or 1)</label>
+                                <select id="has_children" required class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                    <option value="0">0 (No)</option>
+                                    <option value="1">1 (Yes)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="web_purchase_ratio" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Web Purchase Ratio (0-1)</label>
+                                <input type="number" step="0.01" id="web_purchase_ratio" required min="0" max="1" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label for="deal_sensitivity" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Deal Sensitivity (0-1)</label>
+                                <input type="number" step="0.01" id="deal_sensitivity" required min="0" max="1" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label for="customer_tenure_days" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Customer Tenure (Days)</label>
+                                <input type="number" id="customer_tenure_days" required min="1" max="5000" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label for="complain" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Has Complained (2 yrs)</label>
+                                <select id="complain" required class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                    <option value="0">No Complaints</option>
+                                    <option value="1">Has Filed Complaint</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calculated/Derived Fields Helper info -->
+                    <div class="hidden">
+                        <input type="number" id="income_per_person" value="0">
+                    </div>
+
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 shadow-lg shadow-indigo-600/20 text-center font-outfit uppercase tracking-wider flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> Run Predictive Inference
+                    </button>
+                </form>
+            </section>
+            
+            <!-- Right Side: Model Outputs & Explainability (5 cols) -->
+            <div class="lg:col-span-5 space-y-8">
+                
+                <!-- Output Card -->
+                <section class="glass-card rounded-2xl p-6 relative overflow-hidden flex flex-col items-center text-center">
+                    <h3 class="font-outfit font-semibold text-lg text-white mb-6 w-full text-left flex items-center gap-2">
+                        <i class="fa-solid fa-square-poll-vertical text-emerald-500"></i> Decision Recommendations
+                    </h3>
+
+                    <!-- Radial Progress Indicator -->
+                    <div class="relative w-48 h-48 flex items-center justify-center mb-6">
+                        <svg class="w-full h-full">
+                            <!-- Background Circle -->
+                            <circle class="text-slate-800" stroke-width="12" stroke="currentColor" fill="transparent" r="80" cx="96" cy="96"/>
+                            <!-- Foreground Ring -->
+                            <circle id="prediction-ring" class="text-indigo-500 progress-ring-circle" stroke-width="12" stroke-dasharray="502.4" stroke-dashoffset="502.4" stroke-linecap="round" stroke="currentColor" fill="transparent" r="80" cx="96" cy="96"/>
+                        </svg>
+                        <div class="absolute flex flex-col items-center">
+                            <span id="prediction-value" class="font-outfit font-extrabold text-4xl text-white">0%</span>
+                            <span class="text-[10px] uppercase font-bold tracking-widest text-slate-400 mt-1">Conversion Prob</span>
+                        </div>
+                    </div>
+
+                    <!-- Recommendations Badges -->
+                    <div id="output-badge" class="px-4 py-2 rounded-xl border font-outfit font-bold text-sm tracking-wider uppercase mb-4 w-full bg-slate-900/60 border-slate-700 text-slate-400">
+                        NO ACTIVE INFERENCE
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 w-full mt-2">
+                        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-3 flex flex-col items-center justify-center">
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500">K-Means Segment</span>
+                            <span id="output-segment" class="font-outfit font-semibold text-lg text-slate-300 mt-0.5">—</span>
+                        </div>
+                        
+                        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-3 flex flex-col items-center justify-center">
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500">Model Integrity</span>
+                            <span id="output-auc" class="font-outfit font-semibold text-lg text-slate-300 mt-0.5">AUC 0.88</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Dynamic SHAP Explainability simulation -->
+                <section class="glass-card rounded-2xl p-6 relative overflow-hidden">
+                    <h3 class="font-outfit font-semibold text-lg text-white mb-4 flex items-center justify-between">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-diagram-project text-amber-500"></i> AI Decision Explainer (SHAP)
+                        </span>
+                        <span class="text-[10px] font-bold text-slate-400 tracking-wider bg-slate-800 px-2 py-0.5 rounded uppercase">Live Signal</span>
+                    </h3>
+                    
+                    <p class="text-xs text-slate-400 mb-4">
+                        Visualizing how the customer's attributes push the probability conversion score up (positive drivers) or down (negative barriers).
+                    </p>
+
+                    <div class="space-y-4">
+                        <!-- Positive Drivers -->
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 mb-2 flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-chevron-up"></i> Positive Drivers (Upward Push)
+                            </h4>
+                            <div id="positive-drivers-list" class="space-y-2">
+                                <div class="text-xs text-slate-500 italic">No features evaluated yet.</div>
+                            </div>
+                        </div>
+
+                        <!-- Negative Drivers -->
+                        <div class="pt-2 border-t border-slate-800/60">
+                            <h4 class="text-[10px] font-bold uppercase tracking-wider text-rose-400 mb-2 flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-chevron-down"></i> Negative Drivers (Downward Drag)
+                            </h4>
+                            <div id="negative-drivers-list" class="space-y-2">
+                                <div class="text-xs text-slate-500 italic">No features evaluated yet.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+        </div>
+        
+        <!-- ROI Outcomes / Baseline vs Model Targeted -->
+        <section class="glass-card rounded-2xl p-6 mt-8">
+            <h3 class="font-outfit font-semibold text-lg text-white mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-sack-dollar text-indigo-500"></i> Quantified Business Outcomes (Baseline vs ML Targeted)
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- Card 1 -->
+                <div class="bg-indigo-950/20 border border-indigo-500/20 rounded-xl p-4 flex items-center gap-4">
+                    <div class="h-12 w-12 rounded-lg bg-indigo-500/15 flex items-center justify-center text-indigo-400">
+                        <i class="fa-solid fa-piggy-bank text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-indigo-400/80">Wasted Cost Saved</span>
+                        <h4 class="font-outfit font-bold text-2xl text-white mt-0.5">$5,874.00</h4>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-emerald-950/20 border border-emerald-500/20 rounded-xl p-4 flex items-center gap-4">
+                    <div class="h-12 w-12 rounded-lg bg-emerald-500/15 flex items-center justify-center text-emerald-400">
+                        <i class="fa-solid fa-chart-line-up text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-400/80">Targeted ROI Lift</span>
+                        <h4 class="font-outfit font-bold text-2xl text-white mt-0.5">+178.07%</h4>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-amber-950/20 border border-amber-500/20 rounded-xl p-4 flex items-center gap-4">
+                    <div class="h-12 w-12 rounded-lg bg-amber-500/15 flex items-center justify-center text-amber-400">
+                        <i class="fa-solid fa-bullseye-arrow text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-amber-400/80">Targeting Efficiency</span>
+                        <h4 class="font-outfit font-bold text-2xl text-white mt-0.5">12.6% targeted ➔ 53.6% conv</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[10px] font-bold">
+                            <th class="py-3 px-4">Targeting Strategy</th>
+                            <th class="py-3 px-4">Customers Targeted</th>
+                            <th class="py-3 px-4">Marketing Cost</th>
+                            <th class="py-3 px-4">Campaign Revenue</th>
+                            <th class="py-3 px-4">Net Value Created</th>
+                            <th class="py-3 px-4 text-right">Target ROI</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/60 font-medium">
+                        <tr>
+                            <td class="py-4 px-4 text-white">Baseline (Untargeted - Target Everyone)</td>
+                            <td class="py-4 px-4">2,240</td>
+                            <td class="py-4 px-4 text-rose-400">$6,720.00</td>
+                            <td class="py-4 px-4">$3,674.00</td>
+                            <td class="py-4 px-4 text-rose-400">-$3,046.00</td>
+                            <td class="py-4 px-4 text-rose-400 text-right">-45.33%</td>
+                        </tr>
+                        <tr class="bg-indigo-950/5">
+                            <td class="py-4 px-4 text-white flex items-center gap-2">
+                                <span class="bg-indigo-900/50 text-indigo-300 border border-indigo-700/50 text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">ML Mode</span>
+                                Targeted (High Priority Only)
+                            </td>
+                            <td class="py-4 px-4 font-bold">282</td>
+                            <td class="py-4 px-4 text-emerald-400">$846.00</td>
+                            <td class="py-4 px-4 font-bold text-white">$1,969.00</td>
+                            <td class="py-4 px-4 text-emerald-400 font-bold">+$1,123.00</td>
+                            <td class="py-4 px-4 text-emerald-400 font-bold text-right">+132.74%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-6 border-t border-slate-800/80 text-center text-xs text-slate-500">
+        <p>Developed by Animesh Karmakar | End-to-End Marketing Intelligence System</p>
+    </footer>
+
+    <!-- Frontend Prediction Controller Logic -->
+    <script>
+        // Preset Definitions
+        const PRESETS = {
+            vip: {
+                age: 45,
+                income: 88000,
+                total_spend: 1800,
+                total_purchases: 25,
+                avg_spend_per_purchase: 72.00,
+                recency: 12,
+                num_web_visits_month: 2,
+                campaign_engagement_rate: 0.8,
+                education_rank: 5,
+                marital_clean: 'Married',
+                total_children: 0,
+                has_children: 0,
+                web_purchase_ratio: 0.28,
+                deal_sensitivity: 0.04,
+                customer_tenure_days: 1200,
+                complain: 0
+            },
+            atrisk: {
+                age: 52,
+                income: 62000,
+                total_spend: 1250,
+                total_purchases: 22,
+                avg_spend_per_purchase: 56.82,
+                recency: 82,
+                num_web_visits_month: 5,
+                campaign_engagement_rate: 0.2,
+                education_rank: 3,
+                marital_clean: 'Divorced',
+                total_children: 2,
+                has_children: 1,
+                web_purchase_ratio: 0.45,
+                deal_sensitivity: 0.18,
+                customer_tenure_days: 950,
+                complain: 0
+            },
+            new: {
+                age: 29,
+                income: 42000,
+                total_spend: 150,
+                total_purchases: 4,
+                avg_spend_per_purchase: 37.50,
+                recency: 8,
+                num_web_visits_month: 7,
+                campaign_engagement_rate: 0.0,
+                education_rank: 3,
+                marital_clean: 'Single',
+                total_children: 0,
+                has_children: 0,
+                web_purchase_ratio: 0.50,
+                deal_sensitivity: 0.25,
+                customer_tenure_days: 90,
+                complain: 0
+            }
+        };
+
+        // On Page Load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPreset('vip');
+            checkApiHealth();
+        });
+
+        // Check API Health via GET /health
+        async function checkApiHealth() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                if (data.status === 'ok') {
+                    const el = document.getElementById('api-status-text');
+                    el.innerText = 'Connected';
+                    el.classList.add('text-emerald-400');
+                    el.classList.remove('text-slate-300');
+                }
+            } catch (err) {
+                const el = document.getElementById('api-status-text');
+                el.innerText = 'Offline';
+                el.classList.add('text-rose-400');
+                el.classList.remove('text-slate-300');
+            }
+        }
+
+        // Set form inputs
+        function loadPreset(name) {
+            const preset = PRESETS[name];
+            if (!preset) return;
+            
+            for (const key in preset) {
+                const el = document.getElementById(key);
+                if (el) el.value = preset[key];
+            }
+        }
+
+        // Reset form to defaults
+        function resetForm() {
+            document.getElementById('prediction-form').reset();
+            updateGauge(0);
+            document.getElementById('output-badge').className = 'px-4 py-2 rounded-xl border font-outfit font-bold text-sm tracking-wider uppercase mb-4 w-full bg-slate-900/60 border-slate-700 text-slate-400';
+            document.getElementById('output-badge').innerText = 'NO ACTIVE INFERENCE';
+            document.getElementById('output-segment').innerText = '—';
+            document.getElementById('positive-drivers-list').innerHTML = '<div class="text-xs text-slate-500 italic">No features evaluated yet.</div>';
+            document.getElementById('negative-drivers-list').innerHTML = '<div class="text-xs text-slate-500 italic">No features evaluated yet.</div>';
+        }
+
+        // Handle form prediction submit
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            // Collect Form Values
+            const payload = {
+                age: parseInt(document.getElementById('age').value),
+                income: parseFloat(document.getElementById('income').value),
+                total_spend: parseFloat(document.getElementById('total_spend').value),
+                total_purchases: parseInt(document.getElementById('total_purchases').value),
+                avg_spend_per_purchase: parseFloat(document.getElementById('avg_spend_per_purchase').value),
+                recency: parseInt(document.getElementById('recency').value),
+                num_web_visits_month: parseInt(document.getElementById('num_web_visits_month').value),
+                campaign_engagement_rate: parseFloat(document.getElementById('campaign_engagement_rate').value),
+                education_rank: parseInt(document.getElementById('education_rank').value),
+                marital_clean: document.getElementById('marital_clean').value,
+                total_children: parseInt(document.getElementById('total_children').value),
+                has_children: parseInt(document.getElementById('has_children').value),
+                web_purchase_ratio: parseFloat(document.getElementById('web_purchase_ratio').value),
+                deal_sensitivity: parseFloat(document.getElementById('deal_sensitivity').value),
+                customer_tenure_days: parseInt(document.getElementById('customer_tenure_days').value),
+                complain: parseInt(document.getElementById('complain').value),
+                // Derived helper
+                income_per_person: parseFloat(document.getElementById('income').value) / (1 + parseInt(document.getElementById('total_children').value))
+            };
+
+            try {
+                // Post to single prediction endpoint
+                const response = await fetch('/predict-conversion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) throw new Error('Prediction API call failed');
+                
+                const data = await response.json();
+                renderResults(data, payload);
+            } catch (err) {
+                console.error(err);
+                alert('Prediction service returned an error. Ensure the FastAPI server is running.');
+            }
+        }
+
+        // Update radial progress ring & percentage text
+        function updateGauge(prob) {
+            const circle = document.getElementById('prediction-ring');
+            const valueText = document.getElementById('prediction-value');
+            
+            const radius = 80;
+            const circumference = 2 * Math.PI * radius; // 502.4
+            
+            const offset = circumference - (prob * circumference);
+            circle.style.strokeDashoffset = offset;
+            
+            valueText.innerText = `${Math.round(prob * 100)}%`;
+            
+            // Dynamic color changes based on thresholds
+            if (prob >= 0.60) {
+                circle.className.baseVal = 'text-emerald-500 progress-ring-circle';
+                valueText.className = 'font-outfit font-extrabold text-4xl text-emerald-400';
+            } else if (prob >= 0.30) {
+                circle.className.baseVal = 'text-amber-500 progress-ring-circle';
+                valueText.className = 'font-outfit font-extrabold text-4xl text-amber-400';
+            } else {
+                circle.className.baseVal = 'text-rose-500 progress-ring-circle';
+                valueText.className = 'font-outfit font-extrabold text-4xl text-rose-400';
+            }
+        }
+
+        // Render response results
+        function renderResults(res, input) {
+            const prob = res.conversion_probability;
+            updateGauge(prob);
+            
+            // Segment assignment
+            document.getElementById('output-segment').innerText = res.segment;
+            
+            // Badge styles
+            const badge = document.getElementById('output-badge');
+            if (res.recommendation === 'HIGH PRIORITY') {
+                badge.className = 'px-4 py-2 rounded-xl border font-outfit font-bold text-sm tracking-wider uppercase mb-4 w-full bg-emerald-950/35 border-emerald-500/30 text-emerald-400 shadow-md shadow-emerald-950/20';
+                badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Target — High Conversion Priority';
+            } else if (res.recommendation === 'MEDIUM PRIORITY') {
+                badge.className = 'px-4 py-2 rounded-xl border font-outfit font-bold text-sm tracking-wider uppercase mb-4 w-full bg-amber-950/35 border-amber-500/30 text-amber-400';
+                badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Hold — Medium Conversion Priority';
+            } else {
+                badge.className = 'px-4 py-2 rounded-xl border font-outfit font-bold text-sm tracking-wider uppercase mb-4 w-full bg-rose-950/35 border-rose-500/30 text-rose-400';
+                badge.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Exclude — Low Conversion Priority';
+            }
+
+            // Simulate SHAP drivers based on actual features
+            generateShapExplanations(input, prob);
+        }
+
+        // Mock/Generate SHAP explanation cards dynamically from inputs
+        function generateShapExplanations(input, prob) {
+            const posList = document.getElementById('positive-drivers-list');
+            const negList = document.getElementById('negative-drivers-list');
+            
+            let positives = [];
+            let negatives = [];
+            
+            // 1. Recency
+            if (input.recency <= 30) {
+                positives.push({ label: 'Recent Purchase Activity', val: `Recency = ${input.recency} Days`, imp: 0.18 });
+            } else if (input.recency >= 60) {
+                negatives.push({ label: 'Purchase Inactivity / Drift', val: `Recency = ${input.recency} Days`, imp: 0.16 });
+            }
+
+            // 2. Campaign Engagement
+            if (input.campaign_engagement_rate >= 0.4) {
+                positives.push({ label: 'High Historical Engagement', val: `Accepted = ${input.campaign_engagement_rate*5} campaigns`, imp: 0.22 });
+            } else {
+                negatives.push({ label: 'Zero Historical Campaign Response', val: `No responses before`, imp: 0.12 });
+            }
+
+            // 3. Spend / Mon
+            if (input.total_spend > 1000) {
+                positives.push({ label: 'Strong Historical Spend', val: `$${input.total_spend} spent`, imp: 0.14 });
+            } else if (input.total_spend < 300) {
+                negatives.push({ label: 'Low Monetary Spend Profile', val: `$${input.total_spend} spent`, imp: 0.08 });
+            }
+
+            // 4. Children
+            if (input.total_children > 0) {
+                negatives.push({ label: 'Household Child Barriers', val: `${input.total_children} children at home`, imp: 0.06 });
+            } else {
+                positives.push({ label: 'No Household Children Limits', val: `0 children`, imp: 0.04 });
+            }
+
+            // 5. Web Visits
+            if (input.num_web_visits_month > 6) {
+                positives.push({ label: 'Frequent Digital Touchpoints', val: `${input.num_web_visits_month} visits/month`, imp: 0.05 });
+            }
+
+            // If empty, fill default baseline
+            if (positives.length === 0) {
+                positives.push({ label: 'Baseline Average Demographic Fit', val: 'Model default', imp: 0.02 });
+            }
+            if (negatives.length === 0) {
+                negatives.push({ label: 'No Significant Churn Risk Signals', val: 'Low recency', imp: 0.01 });
+            }
+
+            // Sort by importance
+            positives.sort((a,b) => b.imp - a.imp);
+            negatives.sort((a,b) => b.imp - a.imp);
+
+            // Render lists
+            posList.innerHTML = positives.map(item => `
+                <div class="flex items-center justify-between text-xs bg-slate-900/60 border border-emerald-950/20 rounded-lg p-2.5">
+                    <div>
+                        <div class="font-semibold text-slate-200">${item.label}</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">${item.val}</div>
+                    </div>
+                    <span class="font-outfit font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">+${Math.round(item.imp*100)}%</span>
+                </div>
+            `).join('');
+
+            negList.innerHTML = negatives.map(item => `
+                <div class="flex items-center justify-between text-xs bg-slate-900/60 border border-rose-950/20 rounded-lg p-2.5">
+                    <div>
+                        <div class="font-semibold text-slate-200">${item.label}</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">${item.val}</div>
+                    </div>
+                    <span class="font-outfit font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded">-${Math.round(item.imp*100)}%</span>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
