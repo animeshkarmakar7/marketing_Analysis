@@ -541,7 +541,7 @@ Update this section as you complete each phase.
 - [ ] Phase 2: PySpark ETL pipeline
 - [ ] Phase 3: K-Means segmentation model
 - [ ] Phase 3: XGBoost conversion model + SHAP
-- [ ] Phase 4: FastAPI endpoints
+- [x] Phase 4: FastAPI endpoints  ← DONE (3 endpoints: /health, /predict-conversion, /predict-conversion/batch)
 - [ ] Phase 4: Airflow DAG
 - [ ] Phase 5: Power BI dashboard
 - [ ] Final: README.md + GitHub push + documentation
