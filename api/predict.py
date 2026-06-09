@@ -39,9 +39,7 @@ METRICS_PATH = PROJECT_ROOT / "models" / "conversion_model_metrics.json"
 CONVERSION_SCORES_PATH = PROJECT_ROOT / "data" / "processed" / "conversion_scores.csv"
 CUSTOMER_SEGMENTS_PATH = PROJECT_ROOT / "data" / "processed" / "customer_segments.csv"
 
-# ---------------------------------------------------------------------------
-# Feature column order  (must match train_model.py exactly)
-# ---------------------------------------------------------------------------
+
 
 NUMERIC_FEATURES = [
     "age",
@@ -167,9 +165,7 @@ def _request_to_dataframe(request: ConversionPredictionRequest) -> pd.DataFrame:
     return pd.DataFrame([row])[ALL_FEATURES]
 
 
-# ---------------------------------------------------------------------------
-# Public prediction functions (called by route handlers)
-# ---------------------------------------------------------------------------
+
 
 
 def get_model_info() -> dict[str, Any]:
@@ -191,16 +187,6 @@ def get_model_info() -> dict[str, Any]:
 def predict_single(
     request: ConversionPredictionRequest,
 ) -> ConversionPredictionResponse:
-    """
-    Score a single customer record.
-
-    Steps:
-    1. Build a one-row DataFrame from the validated Pydantic request.
-    2. Run through the sklearn Pipeline (StandardScaler + OHE + XGBoost).
-    3. Derive recommendation label from probability thresholds.
-    4. Derive segment by running the KMeans pipeline on the RFM features.
-    5. Return the structured response.
-    """
     pipeline = _load_conversion_pipeline()
     metrics = _load_metrics()
 
@@ -222,12 +208,6 @@ def predict_single(
 
 
 def predict_batch(request: BatchConversionRequest) -> BatchConversionResponse:
-    """
-    Score a batch of customer records efficiently using vectorised
-    pipeline inference.
-
-    Returns individual results plus aggregate priority counts.
-    """
     pipeline = _load_conversion_pipeline()
     metrics = _load_metrics()
 

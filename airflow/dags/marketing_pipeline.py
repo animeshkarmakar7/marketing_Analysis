@@ -137,9 +137,7 @@ def validate_mysql_connection(**context) -> dict:
     return summary
 
 
-# ---------------------------------------------------------------------------
-# Task 2 — PySpark feature engineering
-# ---------------------------------------------------------------------------
+
 
 
 def pyspark_feature_engineering(**context) -> dict:
@@ -158,7 +156,7 @@ def pyspark_feature_engineering(**context) -> dict:
 
     _assert_file(FEATURES_PATH, "features.csv")
 
-    import pandas as pd  # type: ignore[import]
+    import pandas as pd  
 
     df = pd.read_csv(FEATURES_PATH)
     row_count = len(df)
@@ -168,9 +166,6 @@ def pyspark_feature_engineering(**context) -> dict:
     return {"feature_rows": row_count, "feature_columns": col_count}
 
 
-# ---------------------------------------------------------------------------
-# Task 3 — Score all customers with XGBoost model
-# ---------------------------------------------------------------------------
 
 
 def score_customers(**context) -> dict:
